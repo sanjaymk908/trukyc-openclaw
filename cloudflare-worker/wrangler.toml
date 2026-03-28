@@ -1,0 +1,7 @@
+name = "trukyc-relay"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "TRUKYC_KV"
+id = "bbd765c9889e4b54a1e31779dd817c0e"
