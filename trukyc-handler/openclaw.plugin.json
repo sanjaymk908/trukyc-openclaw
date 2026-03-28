@@ -1,0 +1,8 @@
+{
+  "id": "trukyc-pairing",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "trukyc-pairing",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": { ".": "./dist/index.js" },
+  "files": [
+    "dist",
+    "openclaw.plugin.json"
+  ],
+  "scripts": {
+    "build": "tsc && cp openclaw.plugin.json dist/openclaw.plugin.json",
+    "prepack": "npm run build"
+  },
+  "openclaw": {
+    "extensions": [
+      "./dist/index.js"
+    ]
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

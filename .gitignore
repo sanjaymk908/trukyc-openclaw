@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.js.map
+.env
+trukyc-service-account.json
+.dev.vars
+.wrangler/
