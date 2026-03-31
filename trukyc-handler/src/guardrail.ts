@@ -5,7 +5,6 @@ import os from "node:os";
 const RELAY_URL = process.env.TRUKYC_RELAY_URL ?? "";
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY_TRUKYC ?? "";
 
-// Safe tools that never need a danger check
 const SAFE_TOOLS = new Set([
   "read",
   "session_status",
@@ -14,7 +13,6 @@ const SAFE_TOOLS = new Set([
   "ls",
 ]);
 
-// KYC results stored in memory — keyed by challenge sessionId
 const kycResults: Map<string, {
   sessionId:  string;
   isHuman:    boolean;
@@ -85,9 +83,7 @@ Rules:
 - dangerous=true: write/delete/modify files, network requests that send data, payments, system changes, sending messages, installing software, running scripts, modifying permissions, killing processes
 - dangerous=false: read-only operations (ls, pwd, cat, grep, find, head, tail, echo), reading files, querying data, math, answering questions, summarizing, git status/log/diff (read only)
 - For shell/exec tools: only dangerous if the command modifies, deletes, sends, or installs something
-- When in doubt about shell commands: check if the command has side effects. ls, cat, grep = safe. rm, mv, curl POST, pip install = dangerous`;
-
-  const userMessage = `Tool: ${toolName}\nArgs: ${JSON.stringify(toolArgs)}`;
+- When in doubt: ls, cat, grep = safe. rm, mv, curl POST, pip install = dangerous`;
 
   try {
     const resp = await fetch("https://api.anthropic.com/v1/messages", {
@@ -101,7 +97,7 @@ Rules:
         model:      "claude-haiku-4-5-20251001",
         max_tokens: 256,
         system:     systemPrompt,
-        messages:   [{ role: "user", content: userMessage }],
+        messages:   [{ role: "user", content: `Tool: ${toolName}\nArgs: ${JSON.stringify(toolArgs)}` }],
       }),
       signal: AbortSignal.timeout(10000),
     });
@@ -116,10 +112,8 @@ Rules:
     const raw = data.content?.[0]?.text ?? "";
     console.log(`[TruKYC:guardrail] Haiku raw response: ${raw}`);
 
-    // Strip markdown code fences if present
     const cleaned = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     const parsed = JSON.parse(cleaned);
-
     console.log(`[TruKYC:guardrail] Decision — dangerous=${parsed.dangerous} reason="${parsed.reason}" action="${parsed.action}"`);
     return parsed;
 
@@ -143,7 +137,7 @@ async function sendChallenge(device: { fcmToken: string }, action: string): Prom
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      fcmToken:   device.fcmToken,
+      fcmToken: device.fcmToken,
       nonce,
       timestamp,
       salt,
@@ -211,7 +205,6 @@ function verifyJWT(jwt: string): { isHuman: boolean; isAbove21: boolean } | null
 
     console.log(`[TruKYC:verify] JWT payload: isHuman=${payload.isHuman} isAbove21=${payload.isAbove21} exp=${payload.exp}`);
 
-    // Check expiry
     const now = Math.floor(Date.now() / 1000);
     if (payload.exp && payload.exp < now) {
       console.error(`[TruKYC:verify] ❌ JWT expired`);
@@ -240,6 +233,7 @@ function buildKYCBlock(results: typeof kycResults): string {
 
 export function registerGuardrail(api: any): void {
   console.log(`[TruKYC:guardrail] Registering before_tool_call hook`);
+
   api.on("before_tool_call", async (ctx: any) => {
     const toolName = ctx.tool ?? ctx.toolName ?? ctx.name ?? "unknown";
     const toolArgs = ctx.args ?? ctx.input ?? ctx.params ?? {};
@@ -247,9 +241,9 @@ export function registerGuardrail(api: any): void {
     console.log(`[TruKYC:guardrail] ── before_tool_call fired ──`);
     console.log(`[TruKYC:guardrail] tool=${toolName} args=${JSON.stringify(toolArgs)}`);
 
-    // Skip safe tools entirely — no Haiku call needed
+    // Skip safe tools
     if (SAFE_TOOLS.has(toolName)) {
-      console.log(`[TruKYC:guardrail] ✅ Safe tool allowlist — skipping danger check for tool=${toolName}`);
+      console.log(`[TruKYC:guardrail] ✅ Safe tool — skipping danger check for tool=${toolName}`);
       return;
     }
 
@@ -267,9 +261,10 @@ export function registerGuardrail(api: any): void {
     const device = findPairedDevice();
     if (!device) {
       console.error(`[TruKYC:guardrail] ❌ No paired device — blocking tool=${toolName}`);
-      throw new Error(
-        `[TruKYC] Blocked: "${toolName}" requires biometric authorization but no paired TruKYC device found. Pair your device first via the TruKYC iOS app.`
-      );
+      return {
+        block: true,
+        blockReason: `TruKYC: no paired device found. Run /trukyc-pair first.`,
+      };
     }
 
     // Send challenge push
@@ -278,7 +273,10 @@ export function registerGuardrail(api: any): void {
       challengeSessionId = await sendChallenge(device, action);
     } catch (err) {
       console.error(`[TruKYC:guardrail] ❌ Challenge send failed: ${err}`);
-      throw new Error(`[TruKYC] Blocked: "${toolName}" — failed to send biometric challenge: ${err}`);
+      return {
+        block: true,
+        blockReason: `TruKYC: failed to send biometric challenge: ${err}`,
+      };
     }
 
     // Poll for JWT response
@@ -286,14 +284,22 @@ export function registerGuardrail(api: any): void {
     const result = await pollForJWT(challengeSessionId);
 
     if (!result) {
-      throw new Error(`[TruKYC] Blocked: "${toolName}" — biometric challenge timed out or was rejected.`);
+      console.error(`[TruKYC:guardrail] ❌ Challenge timed out — blocking tool=${toolName}`);
+      return {
+        block: true,
+        blockReason: `TruKYC: biometric challenge timed out.`,
+      };
     }
 
     if (!result.isHuman) {
-      throw new Error(`[TruKYC] Blocked: "${toolName}" — biometric verification failed (isHuman=false).`);
+      console.error(`[TruKYC:guardrail] ❌ Biometric failed — blocking tool=${toolName} isHuman=false`);
+      return {
+        block: true,
+        blockReason: `TruKYC: biometric verification failed. Tool blocked.`,
+      };
     }
 
-    // Store result for injection into next prompt
+    // Store result for injection
     storeKYCResult({
       sessionId:  challengeSessionId,
       isHuman:    result.isHuman,
@@ -302,9 +308,11 @@ export function registerGuardrail(api: any): void {
     });
 
     console.log(`[TruKYC:guardrail] ✅ Authorized — allowing tool=${toolName} isHuman=${result.isHuman}`);
+    return;
   });
 
   console.log(`[TruKYC:guardrail] Registering before_prompt_build hook`);
+
   api.on("before_prompt_build", (ctx: any) => {
     console.log(`[TruKYC:guardrail] ── before_prompt_build fired — kycResults count=${kycResults.size}`);
 
@@ -319,7 +327,6 @@ export function registerGuardrail(api: any): void {
       console.log(`[TruKYC:guardrail] Injecting KYC result — sessionId=${sessionId} isHuman=${r.isHuman} verifiedAt=${r.verifiedAt}`);
     }
 
-    // ctx has: prompt, messages — inject into ctx.prompt
     if (typeof ctx.prompt === "string") {
       ctx.prompt = `${ctx.prompt}\n\n${kycBlock}`;
       console.log(`[TruKYC:guardrail] ✅ KYC result injected into ctx.prompt`);
@@ -327,8 +334,7 @@ export function registerGuardrail(api: any): void {
       ctx.systemPrompt = `${ctx.systemPrompt}\n\n${kycBlock}`;
       console.log(`[TruKYC:guardrail] ✅ KYC result injected into ctx.systemPrompt`);
     } else {
-      console.warn(`[TruKYC:guardrail] ⚠️ ctx.prompt type=${typeof ctx.prompt} ctx.systemPrompt type=${typeof ctx.systemPrompt} — cannot inject`);
-      console.warn(`[TruKYC:guardrail] ctx keys=${Object.keys(ctx).join(", ")}`);
+      console.warn(`[TruKYC:guardrail] ⚠️ Cannot inject — ctx keys=${Object.keys(ctx).join(", ")}`);
     }
   });
 
