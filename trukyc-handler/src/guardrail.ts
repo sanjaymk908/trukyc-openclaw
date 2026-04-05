@@ -291,7 +291,7 @@ export function registerGuardrail(api: any): void {
       };
     }
 
-    if (!result.isHuman) {
+    if (!result.isAbove21) {
       console.error(`[TruKYC:guardrail] ❌ Biometric failed — blocking tool=${toolName} isHuman=false`);
       return {
         block: true,
