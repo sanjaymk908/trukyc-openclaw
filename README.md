@@ -81,7 +81,9 @@ Before installing the plugin you will need:
 
 ## 1. Install TruClaw (iOS) & onboard
 
-[![Watch the demo](https://youtu.be/9qI_pPATIjs)
+## Demo Video
+
+[![Watch the demo](https://img.youtube.com/vi/9qI_pPATIjs/0.jpg)](https://youtu.be/9qI_pPATIjs)
 
 ## 2. Clone the repository
 
