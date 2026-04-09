@@ -47,12 +47,13 @@ OpenClaw Agent
 TruKYC Plugin (trukyc-handler)
       │
       ▼
-TruKYC Relay (Cloudflare Worker)
+TruKYC Relay (Cloudflare Worker + Firebase Messaging)
       │
+      | Push Notification
       ▼
 TruClaw iOS App
       │
-      │ human approval
+      │ human approval/ignore
       ▼
 Action allowed / denied
 ```
