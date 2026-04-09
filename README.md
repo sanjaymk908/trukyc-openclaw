@@ -79,7 +79,11 @@ Before installing the plugin you will need:
 
 # Installation
 
-## 1. Clone the repository
+## 1. Install TruClaw (iOS) & onboard
+
+[![Watch the demo](https://youtu.be/9qI_pPATIjs)
+
+## 2. Clone the repository
 
 ```bash
 git clone https://github.com/sanjaymk908/trukyc-openclaw.git
@@ -88,7 +92,7 @@ cd trukyc-openclaw/trukyc-handler
 
 ---
 
-## 2. Install dependencies and build
+## 3. Install dependencies and build
 
 ```bash
 npm install
@@ -97,7 +101,7 @@ npm run build
 
 ---
 
-## 3. Add plugin to `openclaw.json`
+## 4. Add plugin to `openclaw.json`
 
 Add the plugin path:
 
@@ -128,7 +132,7 @@ Add the plugin path:
 
 ---
 
-## 4. Add environment variables
+## 5. Add environment variables
 
 Add these to the `env` section of `openclaw.json`:
 
@@ -141,7 +145,7 @@ Add these to the `env` section of `openclaw.json`:
 
 ---
 
-## 5. Restart OpenClaw
+## 6. Restart OpenClaw
 
 ```bash
 openclaw gateway stop
@@ -152,7 +156,7 @@ sleep 5
 
 ---
 
-## 6. Verify plugin loaded
+## 7. Verify plugin loaded
 
 ```bash
 openclaw plugins list | grep TruKYC
@@ -160,18 +164,20 @@ openclaw plugins list | grep TruKYC
 
 ---
 
-## 7. Pair your iPhone
+## 8. Pair your iPhone
 
-Send the pairing command:
+Send the pairing command in the messaging channel setup for OpenClaw:
 
 ```
 /trukyc-pair
 ```
 
+You will receive a link in response.
+
 Then:
 
-1. Tap the pairing link on your iPhone
-2. Open it with the **TruClaw app**
+1. Tap the pairing link on your iPhone where you installed TruClaw & onboarded youself.
+2. This should automatically open the **TruClaw app**
 3. Confirm pairing
 
 Your device is now registered as an **approval authority**.
@@ -183,12 +189,6 @@ Your device is now registered as an **approval authority**.
 ### Safe Action (No Approval Required)
 
 ```
-check positions
-```
-
-In some OpenClaw setups the first invocation may need to explicitly reference the skill:
-
-```
 with trader skill check positions
 ```
 
@@ -197,13 +197,7 @@ with trader skill check positions
 ### Risky Action (Approval Required)
 
 ```
-sell 10 NVDA
-```
-
-or
-
-```
-with trader skill sell 10 NVDA
+with trader skill buy NVDA at $165
 ```
 
 Flow:
@@ -214,7 +208,7 @@ Flow:
 4. User approves the request
 5. Trade executes
 
-If the user **denies the request**, the action is **blocked**.
+If the user **denies the request** OR **user ignore notification**, the action is **blocked**.
 
 ---
 
