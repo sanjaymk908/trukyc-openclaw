@@ -17,6 +17,7 @@ Short demo showing the flow:
 3. The trade executes only after **human approval in the TruClaw app**
 
 [https://youtube.com/shorts/YJ6W6gcMNew](https://youtube.com/shorts/YJ6W6gcMNew)
+[Watch demo video](sell-order-explain.mp4)
 
 ---
 
