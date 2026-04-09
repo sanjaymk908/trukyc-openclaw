@@ -16,8 +16,7 @@ Short demo showing the flow:
 2. A **sell order** triggers an approval notification on the iPhone
 3. The trade executes only after **human approval in the TruClaw app**
 
-[https://youtube.com/shorts/YJ6W6gcMNew](https://youtube.com/shorts/YJ6W6gcMNew)
-[Watch demo video](sell-order-explain.mp4)
+[![Watch the demo](https://img.youtube.com/vi/YJ6W6gcMNew/0.jpg)](sell-order-explain.mp4)
 
 ---
 
