@@ -1,7 +1,7 @@
 ---
 name: truclaw
-description: Biometric guardrail for OpenClaw. Intercepts dangerous tool calls and requires Face ID verification via TruClaw iOS app before execution. Secure Enclave hardware attestation. No cloud. No compromise.
-metadata: {"openclaw": {"emoji": "🔐", "homepage": "https://github.com/sanjaymk908/trukyc-openclaw", "requires": {"env": ["ANTHROPIC_API_KEY_TRUKYC"]}}}
+description: Biometric guardrail for OpenClaw. Intercepts dangerous tool calls and requires Face ID verification via TruClaw iOS app before execution. Biometric processing is on-device only. A relay (Cloudflare Worker, source included) handles push delivery and JWT exchange.
+metadata: {"openclaw": {"emoji": "🔐", "homepage": "https://github.com/sanjaymk908/trukyc-openclaw", "requires": {"env": ["ANTHROPIC_API_KEY_TRUKYC", "TRUKYC_RELAY_URL"]}, "install": [{"id": "npm", "kind": "node", "package": "openclaw-truclaw", "bins": [], "label": "Install TruClaw plugin (npm)"}]}}
 ---
 
 # TruClaw — Biometric AI Guardrail
@@ -16,31 +16,74 @@ attestation that cryptographically proves a live human authorized the action
 on a specific trusted device. No chat account compromise, no prompt injection,
 no replay attack can forge this.
 
-All biometric processing happens on-device. No photos or facial data ever
-leave your iPhone.
+---
+
+## Privacy and cloud usage — what runs where
+
+| Component | Where it runs |
+|---|---|
+| Face matching and biometric processing | On-device only — Apple Vision framework |
+| Biometric data (photos, face vectors) | Never leaves your iPhone |
+| Danger classification (Claude Haiku) | Anthropic API — tool name and args only, no personal data |
+| Push delivery | Cloudflare Worker relay + Firebase Messaging — session token only, no personal data |
+| JWT signing | iPhone Secure Enclave — key never leaves device |
+| Relay source code | Fully open: https://github.com/sanjaymk908/trukyc-openclaw/tree/main/cloudflare-worker |
+
+The relay handles two things only: forwarding FCM push notifications to your iPhone,
+and temporarily storing the signed JWT (auto-deleted after 2 minutes) for the plugin
+to pick up. It never sees biometric data, photos, or personal information.
+
+You can self-host the relay on your own Cloudflare account using the included
+source code if you prefer not to use the shared relay endpoint.
 
 ---
 
-## Plugin required
+## Security transparency
 
-This skill is a companion to the TruClaw OpenClaw plugin. The skill alone
-does nothing without the plugin installed.
+- Plugin source: https://github.com/sanjaymk908/trukyc-openclaw/tree/main/trukyc-handler
+- Relay source: https://github.com/sanjaymk908/trukyc-openclaw/tree/main/cloudflare-worker
+- The plugin runs in a privileged before_tool_call hook — review the source before installing
+- The relay domain is trukyc-relay.trusources.workers.dev (Cloudflare Workers, owned by plugin author)
+- Self-hosting the relay is supported and documented in the README
 
-Install the plugin first:
+---
+
+## Requirements
+
+- OpenClaw 3.28+
+- TruClaw iOS app (search "TruClaw" on App Store)
+- Anthropic API key (for Claude Haiku danger classification — tool names and args only)
+- TRUKYC_RELAY_URL (default shared relay provided, self-hosting supported)
+
+---
+
+## Setup (3 steps)
+
+### Step 1 — Install TruClaw iOS app
+
+Search "TruClaw" on the App Store. Complete one-time enrollment:
+- Take a selfie
+- Scan your Driver's License or Passport
+- Green badge confirms successful enrollment
+
+Your biometric profile is stored encrypted in your iPhone Secure Enclave.
+No photos or biometric data leave your device at any point.
+
+### Step 2 — Install and configure plugin
 git clone https://github.com/sanjaymk908/trukyc-openclaw.git
 cd trukyc-openclaw/trukyc-handler
 npm install && npm run build
 
-Then add to ~/.openclaw/openclaw.json plugins section:
+Add to ~/.openclaw/openclaw.json plugins section:
 "plugins": {
 "load": {
 "paths": ["/path/to/trukyc-openclaw/trukyc-handler"]
 },
 "entries": {
-"truclaw": { "enabled": true, "config": {} }
+"trukyc-pairing": { "enabled": true, "config": {} }
 },
 "installs": {
-"truclaw": {
+"trukyc-pairing": {
 "source": "path",
 "sourcePath": "/path/to/trukyc-openclaw/trukyc-handler",
 "installPath": "/path/to/trukyc-openclaw/trukyc-handler",
@@ -58,38 +101,12 @@ Add env vars:
 
 Restart OpenClaw:
 openclaw gateway stop && sleep 3 && openclaw gateway install && sleep 5
-openclaw plugins list | grep truclaw
-
----
-
-## Requirements
-
-- OpenClaw 3.28+
-- TruClaw iOS app (search "TruClaw" on App Store)
-- Anthropic API key for Claude Haiku danger classification
-
----
-
-## Setup (3 steps)
-
-### Step 1 — Install TruClaw iOS app
-
-Search "TruClaw" on the App Store. Complete one-time enrollment:
-- Take a selfie
-- Scan your Driver's License or Passport
-- Green badge confirms successful enrollment
-
-Your biometric profile is stored encrypted in your iPhone Secure Enclave.
-Nobody can access or tamper with it.
-
-### Step 2 — Install and configure plugin
-
-See Plugin required section above.
+openclaw plugins list | grep trukyc
 
 ### Step 3 — Pair your iPhone
 
-Run this in any OpenClaw channel:
-/truclaw-pair
+Run in any OpenClaw channel:
+/trukyc-pair
 
 A QR code appears. Scan it with the TruClaw iOS app. Done.
 
@@ -138,11 +155,12 @@ A QR code appears. Scan it with the TruClaw iOS app. Done.
 
 ---
 
-## Privacy
+## Self-hosting the relay
 
-- All face matching runs on-device using Apple Vision framework
-- No photos, selfies, or biometric data stored or transmitted
-- Only encrypted metadata stored in Secure Enclave
-- Relay stores only temporary session tokens (auto-deleted after 2 minutes)
-- Full source: https://github.com/sanjaymk908/trukyc-openclaw
+If you prefer not to use the shared relay endpoint, deploy your own:
+cd trukyc-openclaw/cloudflare-worker
+wrangler deploy worker.js
+
+Then update TRUKYC_RELAY_URL in openclaw.json to your own worker URL.
+Full instructions: https://github.com/sanjaymk908/trukyc-openclaw/tree/main/cloudflare-worker
 
