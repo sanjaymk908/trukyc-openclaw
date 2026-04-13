@@ -69,26 +69,16 @@ No chat account compromise, no prompt injection, no replay attack can forge this
 ---
 
 ## How It Works
-OpenClaw Agent
-│
-│ risky tool call detected
-▼
-TruClaw Plugin (before_tool_call hook)
-│
-│ Claude Haiku danger classification
-▼
-TruClaw Relay (Cloudflare Worker + Firebase Messaging)
-│
-│ Push Notification
-▼
-TruClaw iOS App
-│
-│ Face ID biometric match
-▼
-Secure Enclave signs JWT
-│
-▼
-Plugin verifies JWT → action allowed or blocked
+
+1. OpenClaw Agent detects a tool call
+2. TruClaw Plugin intercepts via `before_tool_call` hook
+3. Claude Haiku classifies the tool call as safe or dangerous
+4. If dangerous → TruClaw Relay (Cloudflare Worker) sends push notification via Firebase Messaging
+5. TruClaw iOS App receives the notification on your iPhone
+6. User completes Face ID biometric match
+7. iPhone Secure Enclave signs an authorization JWT — hardware-bound, tamper-proof
+8. Plugin polls the relay, receives and verifies the JWT
+9. `isAbove21=true` → action proceeds ✅ / `isAbove21=false` → action blocked ❌
 
 ---
 
