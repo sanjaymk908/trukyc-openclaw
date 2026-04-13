@@ -1,5 +1,11 @@
 {
   "id": "trukyc-pairing",
+  "name": "TruClaw",
+  "description": "Biometric guardrail for OpenClaw. Intercepts dangerous tool calls and requires Face ID verification via TruClaw iOS app before execution.",
+  "version": "1.0.0",
+  "entrypoint": "dist/index.js",
+  "homepage": "https://github.com/sanjaymk908/trukyc-openclaw",
+  "skills": ["skills/truclaw"],
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
