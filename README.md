@@ -157,7 +157,7 @@ openclaw plugins list | grep truclaw
 ### 6. Pair your iPhone
 
 Send this in any OpenClaw channel (iMessage, Slack, Telegram, etc.):
-/truclaw-pair
+/trukyc-pair
 
 Tap the pairing link on your iPhone — the TruClaw app opens and confirms pairing automatically.
 
