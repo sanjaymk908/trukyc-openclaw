@@ -162,6 +162,18 @@ Send this in any OpenClaw channel (iMessage, Slack, Telegram, etc.):
 Tap the pairing link on your iPhone — the TruClaw app opens and confirms pairing automatically.
 
 ---
+## FAQ
+
+### ❓ Why doesn’t `/trukyc-pair` work in Slack or Discord?
+
+Short answer: **Slash commands are platform-native features and are not handled by OpenClaw’s message routing layer in Slack/Discord (especially in Socket Mode).**
+
+In Slack and Discord:
+- `/trukyc-pair` is treated as a **native slash command**, not a normal message
+- These require separate platform-specific configuration (e.g. Request URL, interactions endpoint)
+- OpenClaw’s standard channel integrations (including Socket Mode) do **not automatically intercept slash commands**
+
+👉 As a result, this will **NOT work**:
 
 ## Example Interaction
 
