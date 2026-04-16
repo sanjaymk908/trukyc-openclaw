@@ -40,7 +40,7 @@ source code if you prefer not to use the shared relay endpoint.
 
 ## Security transparency
 
-- Plugin source: https://github.com/sanjaymk908/trukyc-openclaw/tree/main/trukyc-handler
+- Plugin source: https://github.com/sanjaymk908/trukyc-openclaw/tree/main/
 - Relay source: https://github.com/sanjaymk908/trukyc-openclaw/tree/main/cloudflare-worker
 - The plugin runs in a privileged before_tool_call hook — review the source before installing
 - The relay domain is trukyc-relay.trusources.workers.dev (Cloudflare Workers, owned by plugin author)
@@ -71,25 +71,17 @@ No photos or biometric data leave your device at any point.
 
 ### Step 2 — Install and configure plugin
 git clone https://github.com/sanjaymk908/trukyc-openclaw.git
-cd trukyc-openclaw/trukyc-handler
+mv trukyc-openclaw truclaw
+cd truclaw
 npm install && npm run build
 
 Add to ~/.openclaw/openclaw.json plugins section:
 "plugins": {
 "load": {
-"paths": ["/path/to/trukyc-openclaw/trukyc-handler"]
+"paths": ["/path/to/truclaw"]
 },
 "entries": {
-"trukyc-pairing": { "enabled": true, "config": {} }
-},
-"installs": {
-"trukyc-pairing": {
-"source": "path",
-"sourcePath": "/path/to/trukyc-openclaw/trukyc-handler",
-"installPath": "/path/to/trukyc-openclaw/trukyc-handler",
-"version": "1.0.0",
-"installedAt": "2026-03-20T21:50:28.059Z"
-}
+"truclaw": { "enabled": true, "config": {} }
 }
 }
 
