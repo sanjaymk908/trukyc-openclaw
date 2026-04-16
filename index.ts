@@ -3,7 +3,7 @@ import { handlePairCommand } from "./src/handler.js";
 import { registerGuardrail } from "./src/guardrail.js";
 
 const plugin = {
-  id: "trukyc-pairing",
+  id: "truclaw",
   name: "TruKYC Pairing",
   description: "Secure Enclave device pairing + biometric guardrails for TruKYC",
   configSchema: emptyPluginConfigSchema(),
