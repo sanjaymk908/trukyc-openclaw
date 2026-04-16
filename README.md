@@ -106,7 +106,8 @@ Search "TruClaw" on the App Store. Complete one-time enrollment:
 
 ```bash
 git clone https://github.com/sanjaymk908/trukyc-openclaw.git
-cd trukyc-openclaw/trukyc-handler
+mv trukyc-openclaw truclaw
+cd truclaw
 npm install
 npm run build
 ```
@@ -117,22 +118,13 @@ npm run build
 "plugins": {
   "load": {
     "paths": [
-      "/path/to/trukyc-openclaw/trukyc-handler"
+      "/path/to/truclaw"
     ]
   },
   "entries": {
     "truclaw": {
       "enabled": true,
       "config": {}
-    }
-  },
-  "installs": {
-    "truclaw": {
-      "source": "path",
-      "sourcePath": "/path/to/trukyc-openclaw/trukyc-handler",
-      "installPath": "/path/to/trukyc-openclaw/trukyc-handler",
-      "version": "1.0.0",
-      "installedAt": "2026-03-20T21:50:28.059Z"
     }
   }
 }
