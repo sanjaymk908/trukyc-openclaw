@@ -1,0 +1,41 @@
+{
+  "id": "truclaw",
+  "name": "TruClaw",
+  "version": "1.0.0",
+  "description": "Biometric guardrail for OpenClaw. Intercepts sensitive tool calls and requires Face ID verification via the TruClaw iOS app before execution.",
+
+  "entry": "dist/index.js",
+
+  "author": "Sanjay Krishnamurthy",
+  "license": "MIT",
+  "homepage": "https://github.com/sanjaymk908/trukyc-openclaw",
+  "repository": "https://github.com/sanjaymk908/trukyc-openclaw",
+
+  "keywords": [
+    "kyc",
+    "biometric",
+    "security",
+    "identity",
+    "guardrails",
+    "authentication"
+  ],
+
+  "skills": [
+    "skills/truclaw"
+  ],
+
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "relayUrl": {
+        "type": "string",
+        "description": "TruClaw relay endpoint for pairing and verification"
+      },
+      "apiKey": {
+        "type": "string",
+        "description": "API key for TruClaw verification service"
+      }
+    }
+  }
+}
