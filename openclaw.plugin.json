@@ -1,15 +1,18 @@
 {
   "id": "truclaw",
   "name": "TruClaw",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Biometric guardrail for OpenClaw. Intercepts sensitive tool calls and requires human validation via TruClaw iOS app before execution.",
 
   "entry": "dist/index.js",
 
   "author": "Sanjay Krishnamurthy",
   "license": "MIT",
+
   "homepage": "https://github.com/sanjaymk908/trukyc-openclaw",
   "repository": "https://github.com/sanjaymk908/trukyc-openclaw",
+
+  "pluginApi": ">=2026.3.28",
 
   "keywords": [
     "kyc",
