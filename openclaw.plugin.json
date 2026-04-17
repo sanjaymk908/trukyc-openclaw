@@ -1,7 +1,7 @@
 {
   "id": "truclaw",
   "name": "TruClaw",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Biometric guardrail for OpenClaw. Intercepts sensitive tool calls and requires human validation via TruClaw iOS app before execution.",
 
   "entry": "dist/index.js",
