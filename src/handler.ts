@@ -119,7 +119,7 @@ export async function handlePairCommand(): Promise<string> {
 
   const sessionId   = randomBytes(16).toString("hex");
   const webhookURL  = `${relayUrl}/pair/${sessionId}`;
-  const pairingLink = `https://yella.co.in/openclaw?sessionId=${sessionId}&webhookURL=${encodeURIComponent(webhookURL)}`;
+  const pairingLink = `https://aasa.trusources.ai/openclaw?sessionId=${sessionId}&webhookURL=${encodeURIComponent(webhookURL)}`;
   const qrImageUrl  = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pairingLink)}`;
 
   console.log(`[TruKYC:pair] sessionId=${sessionId}`);
