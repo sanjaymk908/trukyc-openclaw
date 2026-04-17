@@ -1,93 +1,28 @@
-# TruClaw — Biometric Guardrail for OpenClaw
+# TruClaw
 
-> Stop AI agents from executing dangerous actions without verified human authorization.
-
-TruClaw integrates **OpenClaw agents** with the **TruClaw iOS app** to require **biometric human verification for risky agent actions** before they execute.
-
-This allows developers and enterprises to safely run autonomous agents without risking unintended **financial transactions, infrastructure changes, or other high-impact actions**.
+**Biometric guardrail for OpenClaw.**
+Intercept sensitive tool calls and require **human validation on a paired iPhone** before execution.
 
 ---
 
-## Demo
+## 🎬 Demo
 
-Short demo showing the flow:
+Main demo:
 
-1. A harmless **check positions** command executes normally
-2. A **sell order** triggers an approval notification on the iPhone
-3. The trade executes only after **biometric verification in the TruClaw app**
+https://youtube.com/shorts/YJ6W6gcMNew
 
-[![Watch the demo](https://img.youtube.com/vi/YJ6W6gcMNew/0.jpg)](https://youtube.com/shorts/YJ6W6gcMNew)
+Enrollment + verification demo:
 
----
-
-## The Problem
-
-AI agents with tool access can execute **real-world actions**:
-
-* financial trades
-* infrastructure changes
-* database operations
-* sending emails or messages
-
-Without guardrails, a **hallucination, prompt injection, or tool misuse** could trigger these actions automatically.
-
-TruClaw adds a strong safety primitive:
-
-> **High-risk agent actions require biometric authorization on a trusted mobile device, backed by hardware attestation from the Secure Enclave.**
-
----
-
-## TruClaw vs Native OpenClaw Approval
-
-| | OpenClaw `/approve` | TruClaw Biometric |
-|---|---|---|
-| **Authorization method** | Text command in chat (`/approve <id>`) | Face ID on iPhone |
-| **Proof of human** | None — any operator with channel access can approve | Secure Enclave-backed hardware attestation — cryptographically proves a live human authorized the action |
-| **Attestation** | No hardware attestation | JWT signed by iPhone Secure Enclave — tamper-proof, device-bound, non-exportable |
-| **Out-of-band** | Same channel as the agent | Separate trusted device |
-| **Spoofable** | Yes — compromised chat account approves silently | No — requires physical device + live biometric |
-| **Audit trail** | Chat message | Signed JWT with timestamp, liveness score, device ID |
-| **Enterprise compliance** | ❌ No cryptographic proof | ✅ Hardware-attested human proof — maps to EU AI Act, NIST RMF, SOC2 |
-| **Setup** | None | One-time enrollment with government-issued ID |
-| **Best for** | Convenience approvals, low-risk actions | High-stakes actions, regulated environments, financial operations |
-
-### Why hardware attestation matters
-
-When TruClaw authorizes an action, the approval is not just a message — it is a **JWT signed by the iPhone's Secure Enclave**. The Secure Enclave is a dedicated security processor that:
-
-* generates and stores the signing key in hardware — the key never leaves the device
-* binds the key to the specific iPhone — cannot be copied or exported
-* requires a live biometric match to use the key
-
-This means every TruClaw authorization produces cryptographic proof that:
-1. A specific enrolled human was physically present
-2. On a specific trusted device
-3. At a specific point in time
-
-No chat account compromise, no prompt injection, no replay attack can forge this.
-
----
-
-## How It Works
-
-1. OpenClaw Agent detects a tool call
-2. TruClaw Plugin intercepts via `before_tool_call` hook
-3. Claude Haiku classifies the tool call as safe or dangerous
-4. If dangerous → TruClaw Relay (Cloudflare Worker) sends push notification via Firebase Messaging
-5. TruClaw iOS App receives the notification on your iPhone
-6. User completes Face ID biometric match
-7. iPhone Secure Enclave signs an authorization JWT — hardware-bound, tamper-proof
-8. Plugin polls the relay, receives and verifies the JWT
-9. `isAbove21=true` → action proceeds ✅ / `isAbove21=false` → action blocked ❌
+https://youtu.be/9qI_pPATIjs
 
 ---
 
 ## Prerequisites
 
-* **OpenClaw 3.28+**
-* **Node.js 18+**
-* **Anthropic API key**
-* **TruClaw iOS app installed on iPhone**
+* OpenClaw 3.28+
+* Node.js 18+
+* Anthropic API key
+* TruClaw iOS app installed on iPhone
 
 ---
 
@@ -95,138 +30,221 @@ No chat account compromise, no prompt injection, no replay attack can forge this
 
 ### 1. Install TruClaw iOS app and enroll
 
-Search "TruClaw" on the App Store. Complete one-time enrollment:
-- Take a selfie
-- Scan your Driver's License or Passport
-- Green badge = enrolled
+Search **"TruClaw"** on the App Store.
 
-[![Watch onboarding demo](https://img.youtube.com/vi/9qI_pPATIjs/0.jpg)](https://youtu.be/9qI_pPATIjs)
+Complete one-time enrollment:
 
-### 2. Clone and build
+* Take a selfie
+* Scan your Driver’s License or Passport
+* Green badge = enrolled
 
-```bash
-git clone https://github.com/sanjaymk908/trukyc-openclaw.git
-mv trukyc-openclaw truclaw
-cd truclaw
-npm install
-npm run build
+---
+
+### 2. Install plugin via ClawHub
+
+```bash id="i0clh1"
+openclaw plugins install clawhub:truclaw
 ```
 
-### 3. Add plugin to `~/.openclaw/openclaw.json`
+---
 
-```json
-"plugins": {
-  "load": {
-    "paths": [
-      "/path/to/truclaw"
-    ]
-  },
-  "entries": {
-    "truclaw": {
-      "enabled": true,
-      "config": {}
+### 3. Configure OpenClaw plugin
+
+Add TruClaw to your OpenClaw configuration:
+
+```json id="cfg01"
+{
+  "plugins": {
+    "entries": {
+      "truclaw": {
+        "enabled": true,
+        "config": {
+          "TRUKYC_RELAY_URL": "https://trukyc-relay.trusources.workers.dev",
+          "ANTHROPIC_API_KEY_TRUKYC": "your-anthropic-api-key"
+        }
+      }
     }
   }
 }
 ```
 
-### 4. Add environment variables
+No shell environment variables are required.
 
-```json
-"env": {
-  "TRUKYC_RELAY_URL": "https://trukyc-relay.trusources.workers.dev",
-  "ANTHROPIC_API_KEY_TRUKYC": "your-anthropic-api-key"
+---
+
+### 4. Restart OpenClaw
+
+Restart OpenClaw to load the plugin.
+
+---
+
+### 5. Pair your iPhone
+
+Send this in any OpenClaw channel (Slack, iMessage, Telegram, etc.):
+
+```text id="pair01"
+/trukyc-pair
+```
+
+On your iPhone:
+
+* Tap the pairing link
+* TruClaw app opens automatically
+* Pairing completes instantly
+
+---
+
+### 6. (Optional) Manual plugin load
+
+If the plugin does not auto-load, ensure:
+
+```text id="cfgpath"
+~/.openclaw/openclaw.json
+```
+
+contains:
+
+```json id="cfg02"
+{
+  "plugins": {
+    "load": {
+      "paths": [
+        "/path/to/truclaw"
+      ]
+    },
+    "entries": {
+      "truclaw": {
+        "enabled": true,
+        "config": {
+          "TRUKYC_RELAY_URL": "https://trukyc-relay.trusources.workers.dev",
+          "ANTHROPIC_API_KEY_TRUKYC": "your-anthropic-api-key"
+        }
+      }
+    }
+  }
 }
 ```
 
-### 5. Restart OpenClaw
-
-```bash
-openclaw gateway stop && sleep 3 && openclaw gateway install && sleep 5
-openclaw plugins list | grep truclaw
-```
-
-### 6. Pair your iPhone
-
-Send this in any OpenClaw channel (iMessage, Slack, Telegram, etc.):
-/trukyc-pair
-
-Tap the pairing link on your iPhone — the TruClaw app opens and confirms pairing automatically.
-
----
-## FAQ
-
-### ❓ Why doesn’t `/trukyc-pair` work in Slack or Discord?
-
-Short answer: **Slash commands are platform-native features and are not handled by OpenClaw’s message routing layer in Slack/Discord (especially in Socket Mode).**
-
-In Slack and Discord:
-- `/trukyc-pair` is treated as a **native slash command**, not a normal message
-- These require separate platform-specific configuration (e.g. Request URL, interactions endpoint)
-- OpenClaw’s standard channel integrations (including Socket Mode) do **not automatically intercept slash commands**
-
-👉 As a result, this will **NOT work**:
-
-## Example Interaction
-
-### Safe action — no approval needed
-with trader skill check positions
-
-### Risky action — biometric required
-with trader skill buy NVDA at $165
-
-Flow:
-
-1. Agent attempts trade
-2. TruClaw intercepts the tool call
-3. Push notification sent to iPhone
-4. User opens TruClaw and completes Face ID
-5. Secure Enclave signs authorization JWT
-6. Plugin verifies JWT → trade executes ✅
-
-If the user **ignores the notification** — times out after 5 minutes → blocked ❌
-If **Face ID fails** — blocked ❌
+Then restart OpenClaw.
 
 ---
 
-## Danger Classification
+## How It Works
 
-TruClaw uses Claude Haiku to classify every tool call in real time.
+TruClaw uses Claude Haiku to classify tool calls in real time and enforce **human validation** for sensitive actions.
 
-**Flagged as dangerous:**
-- Shell commands that write, delete, or modify (`rm`, `mv`, `cp`)
-- Network requests that send data (`curl POST`)
-- Installing software (`pip install`, `npm install`)
-- Sending messages, emails, or executing financial actions
+---
 
-**Always safe (no challenge):**
-- Read-only shell commands (`ls`, `cat`, `grep`, `find`)
-- Querying data or answering questions
-- Git read operations (`git status`, `git log`, `git diff`)
-- Explicitly safe tools: `read`, `ls`, `list`, `session_status`, `memory_search`
+### Flagged as dangerous
+
+* Shell commands that write, delete, or modify (`rm`, `mv`, `cp`)
+* Network requests that send data (`curl POST`)
+* Installing software (`pip install`, `npm install`)
+* Sending messages, emails, or executing financial actions
+
+---
+
+### Always safe (no challenge)
+
+* Read-only shell commands (`ls`, `cat`, `grep`, `find`)
+* Querying data or answering questions
+* Git read operations (`git status`, `git log`, `git diff`)
+* Explicitly safe tools: `read`, `ls`, `list`, `session_status`, `memory_search`
+
+---
+
+## Feature Comparison
+
+| Feature                 | OpenClaw `/approve` | TruClaw                          |
+| ----------------------- | ------------------- | -------------------------------- |
+| Approval channel        | Same session        | Separate trusted device          |
+| Authentication          | Manual              | Human validation (paired device) |
+| Replay resistance       | Low                 | High (signed ephemeral JWTs)     |
+| Prompt injection safety | Limited             | Strong (out-of-band approval)    |
+| Audit trail             | Basic               | Cryptographically signed events  |
 
 ---
 
 ## Security Properties
 
-* **Secure Enclave hardware attestation** — every authorization is cryptographically signed by the iPhone's dedicated security processor
-* **Biometric binding** — the signing key is device-bound and requires a live Face ID match to use
-* **Out-of-band approval** — authorization happens on a separate trusted device, not the same channel as the agent
-* **Tamper-proof audit trail** — signed JWTs with timestamp, device ID, and liveness score
-* **Prompt injection resistant** — no chat-based command can forge a biometric authorization
-* **Enterprise compliance ready** — hardware attestation maps to EU AI Act Article 14 (human oversight), NIST AI RMF, and SOC2 access control requirements
+* Secure Enclave–backed device keys
+* Human validation via paired iPhone
+* Out-of-band approval channel
+* Tamper-proof signed audit events
+* Prompt injection resistant execution guardrail
+* Enterprise-ready alignment (EU AI Act, NIST AI RMF, SOC2 patterns)
+
+---
+
+## Trust & Data Flow
+
+### Flow
+
+OpenClaw → TruClaw Plugin → Relay → Mobile Device (FCM/APNs)
+
+### What data is transmitted
+
+* Device push tokens (FCM/APNs)
+* Session identifiers (ephemeral)
+* Tool call metadata (action being approved)
+* Signed approval JWTs
+
+### What is NOT transmitted
+
+* Face images
+* Biometric data
+* Private keys (stored in Secure Enclave)
+
+---
+
+## Default Relay Behavior
+
+TruClaw includes a **managed relay by default**:
+
+```
+https://trukyc-relay.trusources.workers.dev
+```
+
+This allows instant setup without requiring infrastructure configuration.
+
+Advanced users may override this by changing `TRUKYC_RELAY_URL`.
+
+---
+
+## Domain Usage
+
+* `aasa.trusources.ai` → Apple Universal Links only
+* Does NOT handle authentication or relay traffic
+
+---
+
+## Local Data
+
+Stored at:
+
+```text id="local01"
+~/.openclaw/devices/paired.json
+```
+
+Includes:
+
+* Device public key
+* Push notification tokens
+
+No biometric data is stored or transmitted.
 
 ---
 
 ## Privacy
 
-- All face matching runs on-device using Apple's Vision framework
-- No photos, selfies, or biometric data are stored or transmitted
-- Only encrypted metadata (not images) stored in Secure Enclave
-- Relay server stores only temporary session tokens (auto-deleted after 2 minutes)
+* Human validation happens on-device
+* No images or biometric data leave the phone
+* Secure Enclave protects cryptographic keys
+* Relay stores only short-lived session state (~2 minutes)
 
 ---
 
 ## License
 
 MIT
+

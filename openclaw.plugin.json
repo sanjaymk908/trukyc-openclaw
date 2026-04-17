@@ -2,7 +2,7 @@
   "id": "truclaw",
   "name": "TruClaw",
   "version": "1.0.0",
-  "description": "Biometric guardrail for OpenClaw. Intercepts sensitive tool calls and requires Face ID verification via the TruClaw iOS app before execution.",
+  "description": "Biometric guardrail for OpenClaw. Intercepts sensitive tool calls and requires human validation via TruClaw iOS app before execution.",
 
   "entry": "dist/index.js",
 
@@ -20,22 +20,22 @@
     "authentication"
   ],
 
-  "skills": [
-    "skills/truclaw"
-  ],
-
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "relayUrl": {
+      "TRUKYC_RELAY_URL": {
         "type": "string",
-        "description": "TruClaw relay endpoint for pairing and verification"
+        "description": "Relay endpoint used for pairing and approval delivery"
       },
-      "apiKey": {
+      "ANTHROPIC_API_KEY_TRUKYC": {
         "type": "string",
-        "description": "API key for TruClaw verification service"
+        "description": "Anthropic API key used for tool-call risk classification"
       }
-    }
+    },
+    "required": [
+      "TRUKYC_RELAY_URL",
+      "ANTHROPIC_API_KEY_TRUKYC"
+    ]
   }
 }
