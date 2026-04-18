@@ -48,22 +48,7 @@ openclaw plugins install clawhub:truclaw
 
 ---
 
-### 3. Configure environment variables
-
-Add the following to `~/.openclaw/openclaw.json` under the `"env"` key:
-
-```json
-{
-  "env": {
-    "TRUKYC_RELAY_URL": "https://trukyc-relay.trusources.workers.dev",
-    "ANTHROPIC_API_KEY_TRUKYC": "your-anthropic-api-key"
-  }
-}
-```
-
----
-
-### 4. Configure OpenClaw plugin
+### 3. Configuration
 
 Add TruClaw to your OpenClaw configuration:
 
@@ -83,17 +68,15 @@ Add TruClaw to your OpenClaw configuration:
 }
 ```
 
-No shell environment variables are required.
-
 ---
 
-### 5. Restart OpenClaw
+### 4. Restart OpenClaw
 
 Restart OpenClaw to load the plugin.
 
 ---
 
-### 6. Pair your iPhone
+### 5. Pair your iPhone
 
 Send this in any OpenClaw channel (Slack, iMessage, Telegram, etc.):
 
@@ -106,41 +89,6 @@ On your iPhone:
 * Tap the pairing link
 * TruClaw app opens automatically
 * Pairing completes instantly
-
----
-
-### 7. (Optional) Manual plugin load
-
-If the plugin does not auto-load, ensure:
-
-```text
-~/.openclaw/openclaw.json
-```
-
-contains:
-
-```json
-{
-  "plugins": {
-    "load": {
-      "paths": [
-        "/path/to/truclaw"
-      ]
-    },
-    "entries": {
-      "truclaw": {
-        "enabled": true,
-        "config": {
-          "TRUKYC_RELAY_URL": "https://trukyc-relay.trusources.workers.dev",
-          "ANTHROPIC_API_KEY_TRUKYC": "your-anthropic-api-key"
-        }
-      }
-    }
-  }
-}
-```
-
-Then restart OpenClaw.
 
 ---
 
