@@ -50,6 +50,16 @@ openclaw plugins install clawhub:truclaw
 
 ### 3. Configuration
 
+Add the following to `~/.openclaw/openclaw.json` under the `"env"` key:
+
+```json
+{
+  "env": {
+    "TRUKYC_RELAY_URL": "https://trukyc-relay.trusources.workers.dev"
+  }
+}
+```
+
 Add TruClaw to your OpenClaw configuration:
 
 ```json
