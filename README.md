@@ -55,6 +55,7 @@ Add the following to `~/.openclaw/openclaw.json` under the `"env"` key:
 ```json
 {
   "env": {
+    "ANTHROPIC_API_KEY_TRUKYC": "your-anthropic-api-key",
     "TRUKYC_RELAY_URL": "https://trukyc-relay.trusources.workers.dev"
   }
 }
