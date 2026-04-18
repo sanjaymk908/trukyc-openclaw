@@ -1,7 +1,7 @@
 {
   "id": "truclaw",
   "name": "TruClaw",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Security guardrail plugin for OpenClaw. Intercepts sensitive tool calls and requires out-of-band human approval via a paired iPhone. Requires a relay service and an Anthropic API key for risk classification.",
 
   "entry": "dist/index.js",
@@ -35,6 +35,15 @@
       "sensitive": true,
       "placeholder": "sk-ant-...",
       "help": "Used only to classify tool calls as safe or dangerous. Tool metadata (not biometric data) is sent for classification."
+    }
+  },
+
+  "metadata": {
+    "requires": {
+      "env": [
+        "TRUKYC_RELAY_URL",
+        "ANTHROPIC_API_KEY_TRUKYC"
+      ]
     }
   },
 
