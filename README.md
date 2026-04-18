@@ -171,15 +171,44 @@ OpenClaw -> TruClaw Plugin -> Relay -> Mobile Device (FCM/APNs)
 
 ---
 
-## Default Relay Behavior
 
-TruClaw includes a **managed relay by default**:
+## ⚠️ Relay & Data Flow
 
+TruClaw requires a relay service to deliver approval requests to your paired device.
+
+### Default behavior
+By default, TruClaw uses a managed relay:
 https://trukyc-relay.trusources.workers.dev
 
-This allows instant setup without requiring infrastructure configuration.
+This relay receives:
+- Tool-call metadata (actions being approved)
+- Push notification tokens
+- Ephemeral session identifiers
 
-Advanced users may override this by changing `TRUKYC_RELAY_URL`.
+No biometric data or images are transmitted.
+
+---
+
+
+### Self-hosting (recommended for sensitive environments)
+
+You may configure `TRUKYC_RELAY_URL` to point to your own relay.
+
+A reference Cloudflare Worker implementation is included in this repository.
+
+#### Requirements
+
+- Cloudflare Worker
+- KV namespace (for short-lived session state)
+- Firebase service account (for FCM push delivery)
+
+#### Setup (example)
+
+```bash
+wrangler kv:namespace create TRUKYC_KV
+wrangler secret put FIREBASE_SERVICE_ACCOUNT < service-account.json
+```
+
 
 ---
 

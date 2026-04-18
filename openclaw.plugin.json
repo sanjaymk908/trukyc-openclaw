@@ -1,8 +1,8 @@
 {
   "id": "truclaw",
   "name": "TruClaw",
-  "version": "1.1.0",
-  "description": "Biometric guardrail for OpenClaw. Intercepts sensitive tool calls and requires human validation via TruClaw iOS app before execution.",
+  "version": "1.1.1",
+  "description": "Security guardrail plugin for OpenClaw. Intercepts sensitive tool calls and requires out-of-band human approval via a paired iPhone. Requires a relay service and an Anthropic API key for risk classification.",
 
   "entry": "dist/index.js",
 
@@ -23,6 +23,21 @@
     "authentication"
   ],
 
+  "uiHints": {
+    "TRUKYC_RELAY_URL": {
+      "label": "Relay URL",
+      "placeholder": "https://your-relay.example.com",
+      "help": "Relay endpoint used for device pairing and approval delivery. Defaults to a managed relay if not self-hosted.",
+      "advanced": true
+    },
+    "ANTHROPIC_API_KEY_TRUKYC": {
+      "label": "Anthropic API Key",
+      "sensitive": true,
+      "placeholder": "sk-ant-...",
+      "help": "Used only to classify tool calls as safe or dangerous. Tool metadata (not biometric data) is sent for classification."
+    }
+  },
+
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
@@ -36,6 +51,9 @@
         "description": "Anthropic API key used for tool-call risk classification"
       }
     },
-    "required": []
+    "required": [
+      "TRUKYC_RELAY_URL",
+      "ANTHROPIC_API_KEY_TRUKYC"
+    ]
   }
 }
