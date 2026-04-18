@@ -1,3 +1,15 @@
+---
+title: TruClaw
+description: Biometric guardrail for OpenClaw
+env:
+  - name: TRUKYC_RELAY_URL
+    required: true
+    description: Relay endpoint for pairing and approval delivery
+  - name: ANTHROPIC_API_KEY_TRUKYC
+    required: true
+    description: Anthropic API key for tool-call risk classification
+---
+
 # TruClaw
 
 **Biometric guardrail for OpenClaw.**
