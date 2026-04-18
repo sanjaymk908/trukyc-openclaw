@@ -42,7 +42,7 @@ Complete one-time enrollment:
 
 ### 2. Install plugin via ClawHub
 
-```bash id="i0clh1"
+```bash
 openclaw plugins install clawhub:truclaw
 ```
 
@@ -67,7 +67,7 @@ Add the following to `~/.openclaw/openclaw.json` under the `"env"` key:
 
 Add TruClaw to your OpenClaw configuration:
 
-```json id="cfg01"
+```json
 {
   "plugins": {
     "entries": {
@@ -97,7 +97,7 @@ Restart OpenClaw to load the plugin.
 
 Send this in any OpenClaw channel (Slack, iMessage, Telegram, etc.):
 
-```text id="pair01"
+```text
 /trukyc-pair
 ```
 
@@ -113,13 +113,13 @@ On your iPhone:
 
 If the plugin does not auto-load, ensure:
 
-```text id="cfgpath"
+```text
 ~/.openclaw/openclaw.json
 ```
 
 contains:
 
-```json id="cfg02"
+```json
 {
   "plugins": {
     "load": {
@@ -170,19 +170,19 @@ TruClaw uses Claude Haiku to classify tool calls in real time and enforce **huma
 
 ## Feature Comparison
 
-| Feature                 | OpenClaw `/approve` | TruClaw                          |
-| ----------------------- | ------------------- | -------------------------------- |
-| Approval channel        | Same session        | Separate trusted device          |
-| Authentication          | Manual              | Human validation (paired device) |
-| Replay resistance       | Low                 | High (signed ephemeral JWTs)     |
-| Prompt injection safety | Limited             | Strong (out-of-band approval)    |
-| Audit trail             | Basic               | Cryptographically signed events  |
+| Feature | OpenClaw /approve | TruClaw |
+| :--- | :--- | :--- |
+| Approval channel | Same session | Separate trusted device |
+| Authentication | Manual | Human validation (paired device) |
+| Replay resistance | Low | High (signed ephemeral JWTs) |
+| Prompt injection safety | Limited | Strong (out-of-band approval) |
+| Audit trail | Basic | Cryptographically signed events |
 
 ---
 
 ## Security Properties
 
-* Secure Enclave–backed device keys
+* Secure Enclave-backed device keys
 * Human validation via paired iPhone
 * Out-of-band approval channel
 * Tamper-proof signed audit events
@@ -195,7 +195,7 @@ TruClaw uses Claude Haiku to classify tool calls in real time and enforce **huma
 
 ### Flow
 
-OpenClaw → TruClaw Plugin → Relay → Mobile Device (FCM/APNs)
+OpenClaw -> TruClaw Plugin -> Relay -> Mobile Device (FCM/APNs)
 
 ### What data is transmitted
 
@@ -216,9 +216,7 @@ OpenClaw → TruClaw Plugin → Relay → Mobile Device (FCM/APNs)
 
 TruClaw includes a **managed relay by default**:
 
-```
 https://trukyc-relay.trusources.workers.dev
-```
 
 This allows instant setup without requiring infrastructure configuration.
 
@@ -228,7 +226,7 @@ Advanced users may override this by changing `TRUKYC_RELAY_URL`.
 
 ## Domain Usage
 
-* `aasa.trusources.ai` → Apple Universal Links only
+* `aasa.trusources.ai` -> Apple Universal Links only
 * Does NOT handle authentication or relay traffic
 
 ---
@@ -237,7 +235,7 @@ Advanced users may override this by changing `TRUKYC_RELAY_URL`.
 
 Stored at:
 
-```text id="local01"
+```text
 ~/.openclaw/devices/paired.json
 ```
 
@@ -262,4 +260,3 @@ No biometric data is stored or transmitted.
 ## License
 
 MIT
-
