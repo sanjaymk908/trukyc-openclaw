@@ -1,6 +1,24 @@
 ---
 title: TruClaw
-description: Biometric guardrail for OpenClaw
+description: Security plugin for OpenClaw that intercepts sensitive tool calls and requires out-of-band human approval on a paired iPhone before execution.
+tags:
+  - openclaw
+  - security
+  - approval
+  - tool-approval
+  - human-in-the-loop
+  - biometric
+  - iphone
+  - guardrail
+category: security
+keywords:
+  - openclaw security plugin
+  - openclaw approval plugin
+  - tool call approval
+  - human in the loop approval
+  - biometric approval
+  - iphone approval
+  - execution guardrail
 env:
   - name: TRUKYC_RELAY_URL
     required: true
@@ -12,8 +30,9 @@ env:
 
 # TruClaw
 
-**Biometric guardrail for OpenClaw.**
-Intercept sensitive tool calls and require **human validation on a paired iPhone** before execution.
+**TruClaw is a security plugin for OpenClaw that intercepts sensitive tool calls, performs risk classification, and requires out-of-band human approval on a paired iPhone before execution.**
+
+It adds human-in-the-loop approval, biometric verification, and execution guardrails for shell commands, network actions, and other sensitive tool calls.
 
 ---
 
