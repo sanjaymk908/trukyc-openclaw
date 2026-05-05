@@ -11,6 +11,8 @@ const SAFE_TOOLS = new Set([
   "session_status",
   "list",
   "ls",
+  "web_search",
+  "web_fetch",
   // NOTE: memory_search intentionally excluded — poisoned memory reads
   // can shape all subsequent tool calls and must be classified.
 ]);
