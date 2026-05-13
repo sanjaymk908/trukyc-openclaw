@@ -40,11 +40,11 @@ It adds human-in-the-loop approval, biometric verification, and execution guardr
 
 Main demo:
 
-https://youtube.com/shorts/YJ6W6gcMNew
+[![TruClaw Main Demo](https://img.youtube.com/vi/YJ6W6gcMNew/maxresdefault.jpg)](https://youtube.com/shorts/YJ6W6gcMNew)
 
 Enrollment + verification demo:
 
-https://youtu.be/9qI_pPATIjs
+[![TruClaw Enrollment Demo](https://img.youtube.com/vi/9qI_pPATIjs/maxresdefault.jpg)](https://youtu.be/9qI_pPATIjs)
 
 ---
 
